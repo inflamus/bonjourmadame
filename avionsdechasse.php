@@ -1,6 +1,6 @@
 #!/bin/usr/php
 <?php
-define('AC_URL', 'http://www.mensquare.com/avionsdechasse/avions/$page?type=last');
+define('AC_URL', 'http://www.avionsdechasse.org/avions/$page?type=last');
 define('AC_PATH', '/home/romein/Pictures/Avions de Chasse/');
 define('AC_DB', '.avions.db');
 define('AC_PREVENT_DUPLICATE', true); // set to false to download every pictures, even if it is recurrent.
