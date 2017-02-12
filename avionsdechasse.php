@@ -119,8 +119,8 @@ while($tictac != (isset($argv[1]) ? $argv[1] : 3))
 // 	print "DEBUG : URL = $url\n";
 	$raw = file_get_contents($url);
 // 	print "DEBUG : RAW successful, here : $raw\n";
-	//http://i0.wp.com/public.avionsdechasse.org/images/sources/2016/01/20160128081501_1_carre.jpg
-	if(preg_match_all('/(http:\/\/[a-z0-9]+\.wp\.com\/public\.avionsdechasse\.org\/images\/sources\/[0-9]{4}\/[0-9]{2}\/[0-9]{14}[_0-9]*)_carre\.jpg.+\#([0-9]+)</Us', $raw, $matches))
+	//https://i0.wp.com/public.avionsdechasse.org/images/sources/2016/10/20161016095309_4_carre.jpg
+	if(preg_match_all('/(https?:\/\/[a-z0-9]+\.wp\.com\/public\.avionsdechasse\.org\/images\/sources\/[0-9]{4}\/[0-9]{2}\/[0-9]{14}[_0-9]*)_carre\.jpg.+\#([0-9]+)</Us', $raw, $matches))
 	{
 // 		print "DEBUG : MATCHES = ".print_r($matches, true);
 		$diff=array_diff($matches[2], $alreadyDownloaded);
