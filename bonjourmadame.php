@@ -157,7 +157,9 @@ foreach($rss->posts as $p)
 	//http://41.media.tumblr.com/de2babab556c386245f5c5707143a9f8/tumblr_nv69p6fH611qzy9ouo1_500.jpg
 	preg_match('#(https?:\/\/[0-9]{1,3}.media.tumblr.com\/[a-f0-9]{32}\/tumblr_[a-zA-Z0-9_]+)_500.(jpe?g|png)#', $p->text, $match);
 	$url = $match[1].'_'.PICTURE_SIZE.'.'.$match[2];
-	download_id($id, $url);
+	$d = date("w", strtotime($p->date));
+	if($d != 0 && $d != 6) // zap saturday and sundays
+		download_id($id, $url);
 }
 
 exit();
