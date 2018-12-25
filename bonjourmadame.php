@@ -37,7 +37,7 @@ class BlogFeed
         $file_or_url = $this->resolveFile($file_or_url);
         if (!($x = simplexml_load_file($file_or_url)))
             return;
-
+	
         foreach ($x->channel->item as $item)
         {
             $post = new BlogPost();
@@ -45,9 +45,10 @@ class BlogFeed
             $post->ts    = @strtotime($item->pubDate);
             $post->link  = (string) $item->link;
             $post->title = (string) $item->title;
-            $post->text  = (string) $item->description;
+//          $post->text  = (string) $item->description;
+		$post->text = (string) $item->children('content', true)->encoded;
 
-            // Create summary as a shortened body and remove images, 
+		// Create summary as a shortened body and remove images, 
             // extraneous line breaks, etc.
             $post->summary = $this->summarizeText($post->text);
 
@@ -104,7 +105,7 @@ function download_id($id, $imgurl=null){
 	if(!substr($id, 0, 1)=='/')
 		$id = '/'.$id;
 
-	$file = DOWNLOAD_DIR.$id.'.jpg';
+	$file = DOWNLOAD_DIR.'/'.$id.'.jpg';
 	print( 'Downloading image id '.$id." at url <".$imgurl."> ..." );
 	if(file_exists($file))
 	{
@@ -154,9 +155,15 @@ foreach($rss->posts as $p)
 {
 	//print $p->link."\n";
 	$id = strrchr($p->link, '/');
+	$id = $p->ts;
 	//http://41.media.tumblr.com/de2babab556c386245f5c5707143a9f8/tumblr_nv69p6fH611qzy9ouo1_500.jpg
-	preg_match('#(https?:\/\/[0-9]{1,3}.media.tumblr.com\/[a-f0-9]{32}\/tumblr_[a-zA-Z0-9_]+)_500.(jpe?g|png)#', $p->text, $match);
-	$url = $match[1].'_'.PICTURE_SIZE.'.'.$match[2];
+// 	preg_match('#(https?:\/\/[0-9]{1,3}.media.tumblr.com\/[a-f0-9]{32}\/tumblr_[a-zA-Z0-9_]+)_500.(jpe?g|png)#', $p->text, $match);
+	//https://i1.wp.com/bonjourmadame.fr/wp-content/uploads/2018/12/181221.jpg
+// 	print $p->text;
+// 	continue;
+	preg_match('#https?:\/\/i[0-9]{1,3}.wp.com\/bonjourmadame.fr\/wp-content\/uploads\/20[0-9]{2}\/[0-9]{2}\/[a-zA-Z0-9_-]+.(jpe?g|png)#', $p->text, $match);
+// 	$url = $match[1].'_'.PICTURE_SIZE.'.'.$match[2];
+	$url = $match[0];
 	$d = date("w", strtotime($p->date));
 	if($d != 0 && $d != 6) // zap saturday and sundays
 		download_id($id, $url);
