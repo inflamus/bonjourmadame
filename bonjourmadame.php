@@ -140,6 +140,21 @@ function download_id($id, $imgurl=null){
 
 if(!empty($argv[1]))
 {
+	if(is_file($argv[1])) // PODCASTADDICT sqlite file
+	{
+		$DB = new SQLite3($argv[1], SQLITE3_OPEN_READONLY);
+		$contents = $DB->query('SELECT publication_date, content FROM episodes WHERE podcast_id=(SELECT _id FROM podcasts WHERE name like "%Bonjour%");');
+		while($c = $contents->fetchArray(SQLITE3_ASSOC))
+		{
+			if(preg_match('#https?:\/\/i[0-9]{1,3}.wp.com\/bonjourmadame.fr\/wp-content\/uploads\/20[0-9]{2}\/[0-9]{2}\/[a-zA-Z0-9_-]+.(jpe?g|png)#', $c['content'], $match))
+			{
+				$c['publication_date'] = (int)substr($c['publication_date'], 0, -3);
+				$d = (int)date("w", $c['publication_date']);
+				if($d != 0 && $d != 6) // zap saturday and sundays
+					download_id($c['publication_date'], $match[0]);
+			}
+		}
+	}
 	$next_page = parse_all(file_get_contents(ARCHIVE_URL));
 	if($argv[1] > 1)
 	for($i = 1; $i<= $argv[1]; $i++)
@@ -147,6 +162,7 @@ if(!empty($argv[1]))
 		print "\nPage $i\n";
 		$next_page = parse_all(file_get_contents(BM_URL.$next_page)); // format : /archive?before_time=0-9
 	}
+	exit;
 }
 
 
@@ -164,7 +180,9 @@ foreach($rss->posts as $p)
 	preg_match('#https?:\/\/i[0-9]{1,3}.wp.com\/bonjourmadame.fr\/wp-content\/uploads\/20[0-9]{2}\/[0-9]{2}\/[a-zA-Z0-9_-]+.(jpe?g|png)#', $p->text, $match);
 // 	$url = $match[1].'_'.PICTURE_SIZE.'.'.$match[2];
 	$url = $match[0];
-	$d = date("w", strtotime($p->date));
+	print $p->date;
+	print strtotime($p->date);
+	$d = (int)date("w", strtotime($p->date));
 	if($d != 0 && $d != 6) // zap saturday and sundays
 		download_id($id, $url);
 }
